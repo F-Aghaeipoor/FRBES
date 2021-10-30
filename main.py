@@ -20,17 +20,17 @@ from sklearn.metrics import confusion_matrix,ConfusionMatrixDisplay
 
 #dataset_name='MB-GE-ER'
 #dataset_name='data_myron' 
-#dataset_name='breast_cancer'
+dataset_name='breast_cancer'
 #dataset_name='xor'
-dataset_name='MAGIC'
+# dataset_name='MAGIC'
 #dataset_name='LetterRecognitionComplete'
 #dataset_name='iris'
 
 
-def runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn):
+def runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,prunning_ths):
   X_Mask = getMask(dataset_name,X_tr,FI_X,3)
   start_time = time.time()
-  chi = ChiRWClassifier(labels=3,frm="wr", RW_tsh=0)
+  chi = ChiRWClassifier(labels=3,frm="wr", RW_tsh=prunning_ths)
 
   chi.fit(X_tr,y_tr,X_Mask)
 
@@ -74,4 +74,4 @@ def runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn):
 
 
 X_tr,y_tr,X_tst,y_tst,FI_X,y_nn =load_data(dataset_name)
-runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn)
+runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,0.5)
