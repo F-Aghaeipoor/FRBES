@@ -80,6 +80,6 @@ def runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,prunning_ths):
 
 
 
-
-X_tr,y_tr,X_tst,y_tst,FI_X,y_nn =load_data(dataset_name)
-runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,0)
+if __name__ == '__main__':
+  X_tr,y_tr,X_tst,y_tst,FI_X,y_nn =load_data(dataset_name)
+  runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,0)
