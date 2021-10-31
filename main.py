@@ -28,19 +28,23 @@ dataset_name='breast_cancer'
 
 
 def runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,prunning_ths):
-  X_Mask = getMask(dataset_name,X_tr,FI_X,3)
+  topF=3
+  X_Mask = getMask(dataset_name,X_tr,FI_X,topF)
   start_time = time.time()
   chi = ChiRWClassifier(labels=3,frm="wr", RW_tsh=prunning_ths)
 
   chi.fit(X_tr,y_tr,X_Mask)
 
   y_pred = chi.predict(X_tr)
-  print("The accuracy of Chi-FRBCS model (train) is: ", accuracy_score(y_tr,y_pred)*100)
+  acc1=accuracy_score(y_tr,y_pred)*100
+  print("The accuracy of Chi-FRBCS model (train) is: ",acc1 )
 
   y_pred = chi.predict(X_tst)
-  print("\nThe accuracy of Chi-FRBCS model (test) is: ", accuracy_score(y_tst,y_pred)*100)
+  acc2=accuracy_score(y_tst,y_pred)*100
+  print("\nThe accuracy of Chi-FRBCS model (test) is: ",acc2 )
 
   #Only for two-class problems
+  auc_tst=0
   if len(np.unique(y_tr))==2:
       probas_ = chi.predict_proba(X_tst)
       fpr, tpr, thresholds = roc_curve(y_tst, probas_[:, 1])
@@ -57,15 +61,19 @@ def runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,prunning_ths):
   minutes = int(rest / 60);
   seconds = rest % 60;
 
-  print('The Fidelity is the models: ',compute_fidelity(y_nn,y_pred)*100)
+  Fidelity=compute_fidelity(y_nn,y_pred)*100
+  print('The Fidelity is the models: ',Fidelity)
   print('--------------------------------')
   print("\nExecution Time: ", hours , ":" , minutes , ":" , '{0:.4g}'.format(seconds))
 
   cm=confusion_matrix(y_tst, y_pred, normalize='all')
   cmd = ConfusionMatrixDisplay(cm, display_labels=['0','1'])
   cmd.plot()
-
-
+  NR=chi.kb.NR
+  TRL=chi.kb.ARL
+  NF=topF
+  ths=prunning_ths
+  return acc1,acc2,auc_tst,GM,NF,NR,TRL,Fidelity,ths
   ##Standard cross-validation is also available
   #scores = cross_val_score(chi, iris.data, iris.target, cv=5,scoring='accuracy')
   #print(scores)
@@ -74,4 +82,4 @@ def runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,prunning_ths):
 
 
 X_tr,y_tr,X_tst,y_tst,FI_X,y_nn =load_data(dataset_name)
-runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,0.5)
+runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,0)

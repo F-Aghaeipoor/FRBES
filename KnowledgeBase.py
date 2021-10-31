@@ -45,6 +45,8 @@ class KnowledgeBase:
         #print(self.matchingDegrees)
         self.ruleBase = list()
         self.totalRL=0
+        self.ARL=0
+        self.NR=0
         self.classLabels = 0
         self.rules_count =  0
     def includeInitialRules(self, ruleBaseTmp):
@@ -149,8 +151,10 @@ class KnowledgeBase:
 #                print("Rule found: IF ",rule,"THEN",classLabel,"RW:",ruleWeight)
         RWs=[i.ruleWeight for i in self.ruleBase]
         print('--------------------------------')
-        print("Rule Base: "+str(len(self.ruleBase)))
-        print("Average Rule lenght: "+str(self.totalRL/len(self.ruleBase)))
+        self.NR=len(self.ruleBase)
+        print("Rule Base: "+str(self.NR))
+        self.ARL=self.totalRL/len(self.ruleBase)
+        print("Average Rule lenght: "+str(self.ARL))
         print('--------------------------------')
         print('Min RW:', min(RWs), '\nMax RW:', max(RWs))
 
