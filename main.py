@@ -19,11 +19,9 @@ from sklearn.metrics import confusion_matrix,ConfusionMatrixDisplay
 
 
 
-
-
 def runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,topF,prunning_ths,RW_measure):
   topF=topF
-  X_Mask = getMask(dataset_name,X_tr,FI_X,topF)
+  X_Mask = getMask(X_tr,FI_X,topF)
   NF=((X_Mask==1).sum(axis=0)!=0).sum()
   print('Number of Contributing Features: ', NF)
 

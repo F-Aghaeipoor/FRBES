@@ -12,7 +12,7 @@ from sklearn.feature_selection import SelectKBest,SelectFromModel,RFE,chi2,mutua
 
 
 
-def getMask(dataset_name,X,FI_X, topN=3):
+def getMask(X,FI_X, topN=3):
     """
         Find and return the most influencial features for modeling,
         They are determinded based on Features' Importance received from the trained DNN.
