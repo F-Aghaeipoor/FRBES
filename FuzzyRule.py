@@ -16,7 +16,7 @@ class FuzzyRule:
         * ruleWeight: consequent confidence degree
     """
     
-    def __init__(self,antecedents,classLabel,ruleWeight):
+    def __init__(self,antecedents,classLabel,ruleWeight,Supp,Conf=0):
         """
             Creates a rule from already established values
             * antecedents is a list of strings, each of each is simple a number (fuzzy label index)
@@ -31,7 +31,9 @@ class FuzzyRule:
                 self.real_antecedents.append(ind)
         self.classLabel = classLabel
         self.ruleWeight = ruleWeight
-        
+        self.Supp = Supp
+        self.Conf = Conf
+
     def getAntecedents(self):
         return self.antecedents
     

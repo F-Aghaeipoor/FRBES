@@ -18,20 +18,17 @@ import pandas as pd
 from sklearn.metrics import confusion_matrix,ConfusionMatrixDisplay
 
 
-#dataset_name='MB-GE-ER'
-#dataset_name='data_myron' 
-dataset_name='breast_cancer'
-#dataset_name='xor'
-# dataset_name='MAGIC'
-#dataset_name='LetterRecognitionComplete'
-#dataset_name='iris'
 
 
-def runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,prunning_ths):
-  topF=3
+
+def runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,topF,prunning_ths,RW_measure):
+  topF=topF
   X_Mask = getMask(dataset_name,X_tr,FI_X,topF)
+  NF=((X_Mask==1).sum(axis=0)!=0).sum()
+  print('Number of Contributing Features: ', NF)
+
   start_time = time.time()
-  chi = ChiRWClassifier(labels=3,frm="wr", RW_tsh=prunning_ths)
+  chi = ChiRWClassifier(labels=3,frm="wr", RW_tsh=prunning_ths, RW_measure=RW_measure)
 
   chi.fit(X_tr,y_tr,X_Mask)
 
@@ -70,10 +67,10 @@ def runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,prunning_ths):
   cmd = ConfusionMatrixDisplay(cm, display_labels=['0','1'])
   cmd.plot()
   NR=chi.kb.NR
-  TRL=chi.kb.ARL
-  NF=topF
-  ths=prunning_ths
-  return acc1,acc2,auc_tst,GM,NF,NR,TRL,Fidelity,ths
+  ARL=chi.kb.ARL
+  ths = prunning_ths
+
+  return acc1,acc2,auc_tst,GM,NF,NR,ARL,Fidelity,ths
   ##Standard cross-validation is also available
   #scores = cross_val_score(chi, iris.data, iris.target, cv=5,scoring='accuracy')
   #print(scores)
@@ -81,5 +78,18 @@ def runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,prunning_ths):
 
 
 if __name__ == '__main__':
+  # dataset_name='MB-GE-ER'
+  dataset_name='data_myron'
+  # dataset_name='breast_cancer'
+  # dataset_name = 'xor'
+  # dataset_name='MAGIC'
+  # dataset_name='LetterRecognitionComplete'
+  # dataset_name='iris'
   X_tr,y_tr,X_tst,y_tst,FI_X,y_nn =load_data(dataset_name)
-  runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,0)
+
+  print(X_tr.shape)
+  print(X_tst.shape)
+  print(FI_X.shape)
+
+  runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,topF=3,prunning_ths=0.5,RW_measure='RW_PCF')    #RW_PCF  RW_non_fuzzy_conf
+

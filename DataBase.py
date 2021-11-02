@@ -59,11 +59,17 @@ class DataBase():
     """
     def getRuleFromExample(self,example,example_mask):
         labels = str()
+        j=0
+        # print(example)
+        # print(example_mask)
         for fuzzyVar,inputValue, mask in zip(self.FuzzyLabels_,example,example_mask):
+
             if mask==1 :
+                j+=1
                 labels = labels + str(fuzzyVar.getLabelIndex(inputValue))+','
             else:
                 labels = labels + str(-1)+','
+        # print('len -==============',j)
         return labels
 
     """

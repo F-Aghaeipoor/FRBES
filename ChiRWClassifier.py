@@ -53,7 +53,7 @@ class ChiRWClassifier(BaseEstimator, ClassifierMixin):
         The classes seen at :meth:`fit`.
     """
 
-    def __init__(self, labels=3, tnorm="product", rw="pcf", frm="wr", RW_tsh=0):
+    def __init__(self, labels=3, tnorm="product", rw="pcf", frm="wr", RW_tsh=0,RW_measure='RW_PCF'):
         """
         Called when initializing the classifier
         only product tnorm is implemented throughout the source code
@@ -99,7 +99,7 @@ class ChiRWClassifier(BaseEstimator, ClassifierMixin):
         
         #The learning part goes here
         dataBase = DataBase(X,self.labels)
-        self.kb = KnowledgeBase(X,y,X_Mask,dataBase,self.RW_tsh)
+        self.kb = KnowledgeBase(X,y,X_Mask,dataBase,self.RW_tsh,self.RW_measure)
         self.kb.generation()
 
         # Return the classifier

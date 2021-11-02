@@ -53,26 +53,26 @@ def load_data(dataset_name):
 
     if dataset_name=='data_myron':
         ### Without FS
-#        X_tr = pd.read_csv('C:\\Users\\MASNA.CO\\Desktop\\SEARCHES\\Codes\\data\\data_myron\\GSE89843_TEP_Count_Matrix_ruvseq_diff_1_training.csv', index_col=0)
-#        y_tr = pd.read_csv('C:\\Users\\MASNA.CO\\Desktop\\SEARCHES\\Codes\\data\\data_myron\\ruvseq_diff_1_training.csv', sep=",", index_col=0)
-#        X_tst = pd.read_csv('C:\\Users\\MASNA.CO\\Desktop\\SEARCHES\\Codes\\data\\data_myron\\GSE89843_TEP_Count_Matrix_ruvseq_diff_1_test.csv', index_col=0)
-#        y_tst = pd.read_csv('C:\\Users\\MASNA.CO\\Desktop\\SEARCHES\\Codes\\data\\data_myron\\ruvseq_diff_1_test.csv', sep=",", index_col=0)
-#        X_tr=np.array(X_tr)
-#        y_tr=np.array(y_tr).reshape(-1)
-#        X_tst=np.array(X_tst)
-#        y_tst=np.array(y_tst).reshape(-1)
+       X_tr = pd.read_csv('C:\\Users\\MASNA.CO\\Desktop\\SEARCHES\\Codes\\data\\data_myron\\GSE89843_TEP_Count_Matrix_ruvseq_diff_1_training.csv', index_col=0)
+       y_tr = pd.read_csv('C:\\Users\\MASNA.CO\\Desktop\\SEARCHES\\Codes\\data\\data_myron\\ruvseq_diff_1_training.csv', sep=",", index_col=0)
+       X_tst = pd.read_csv('C:\\Users\\MASNA.CO\\Desktop\\SEARCHES\\Codes\\data\\data_myron\\GSE89843_TEP_Count_Matrix_ruvseq_diff_1_test.csv', index_col=0)
+       y_tst = pd.read_csv('C:\\Users\\MASNA.CO\\Desktop\\SEARCHES\\Codes\\data\\data_myron\\ruvseq_diff_1_test.csv', sep=",", index_col=0)
+       X_tr=np.array(X_tr)
+       y_tr=np.array(y_tr).reshape(-1)
+       X_tst=np.array(X_tst)
+       y_tst=np.array(y_tst).reshape(-1)
         
         ####With FS
-        X_tr = pd.read_csv('C:\\Users\\MASNA.CO\\Desktop\\SEARCHES\\Codes\\data\\data_myron\\X_tr.csv', index_col=0)
-        y_tr = pd.read_csv('C:\\Users\\MASNA.CO\\Desktop\\SEARCHES\\Codes\\data\\data_myron\\y_tr.csv', sep=",", index_col=0)
-        X_tst = pd.read_csv('C:\\Users\\MASNA.CO\\Desktop\\SEARCHES\\Codes\\data\\data_myron\\X_tst.csv', index_col=0)
-        y_tst = pd.read_csv('C:\\Users\\MASNA.CO\\Desktop\\SEARCHES\\Codes\\data\\data_myron\\y_tst.csv', sep=",", index_col=0)
-        y_tr=np.array(y_tr).reshape(-1)
-        y_tst=np.array(y_tst).reshape(-1)
+        # X_tr = pd.read_csv('C:\\Users\\MASNA.CO\\Desktop\\SEARCHES\\Codes\\data\\data_myron\\X_tr.csv', index_col=0)
+        # y_tr = pd.read_csv('C:\\Users\\MASNA.CO\\Desktop\\SEARCHES\\Codes\\data\\data_myron\\y_tr.csv', sep=",", index_col=0)
+        # X_tst = pd.read_csv('C:\\Users\\MASNA.CO\\Desktop\\SEARCHES\\Codes\\data\\data_myron\\X_tst.csv', index_col=0)
+        # y_tst = pd.read_csv('C:\\Users\\MASNA.CO\\Desktop\\SEARCHES\\Codes\\data\\data_myron\\y_tst.csv', sep=",", index_col=0)
+        # y_tr=np.array(y_tr).reshape(-1)
+        # y_tst=np.array(y_tst).reshape(-1)
 
             
-        FI_X = pd.read_csv('C:/Users/MASNA.CO/Desktop/SEARCHES/Codes/data/data_myron/FI_X.csv',sep=',',)
-        y_nn=pd.read_csv('C:/Users/MASNA.CO/Desktop/SEARCHES/Codes/data/data_myron/predicted.csv',sep=',',index_col=0)
+       FI_X = pd.read_csv('C:/Users/MASNA.CO/Desktop/SEARCHES/Codes/data/data_myron/FI_X.csv',sep=',',)
+       y_nn=pd.read_csv('C:/Users/MASNA.CO/Desktop/SEARCHES/Codes/data/data_myron/predicted.csv',sep=',',index_col=0)
 
     elif dataset_name=='MB-GE-ER':
         data = pd.read_csv('C:/Users/MASNA.CO/Desktop/SEARCHES/Codes/data/MB-GE-ER/data.csv',sep=',',)
@@ -128,6 +128,6 @@ def load_data(dataset_name):
         X_tr, X_tst, y_tr, y_tst = train_test_split(X, y, test_size=0.33, random_state=42)
         FI_X = np.ones(X.shape)
         y_nn=np.ones(y_tst.shape)
-        
+
     y_nn= np.array(y_nn).reshape(-1) 
     return X_tr,y_tr,X_tst,y_tst,FI_X,y_nn
