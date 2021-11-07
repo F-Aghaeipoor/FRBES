@@ -65,12 +65,33 @@ class KnowledgeBase:
             It obtains the matching degrees of each rule with all the examples,
             and stores the accumulation value for each class label
         """
-        for example,classLabel in zip(self.X,self.y):
-            j=-1
-            for rule in self.ruleBase:
-                j+=1
-                nu = self.dataBase.computeMatchingDegree2(rule, example)
-                self.matchingDegrees[j][classLabel] += nu
+        if self.RW_measure == 'RW_PCF_CS':
+            count_y = {}
+            max_count = 0
+            for class_label in np.unique(self.y):
+                count_y[class_label] = self.y.tolist().count(class_label)
+                if max_count < count_y[class_label]:
+                    max_count = count_y[class_label]
+                print(class_label, count_y[class_label])
+
+            cost = {k: max_count / v for k, v in count_y.items()}
+
+            for example,classLabel in zip(self.X,self.y):
+                j=-1
+                for rule in self.ruleBase:
+                    j+=1
+                    nu = self.dataBase.computeMatchingDegree2(rule, example) * cost[classLabel]
+                    self.matchingDegrees[j][classLabel] += nu
+
+        elif self.RW_measure == 'RW_PCF':
+            for example,classLabel in zip(self.X,self.y):
+                j=-1
+                for rule in self.ruleBase:
+                    j+=1
+                    nu = self.dataBase.computeMatchingDegree2(rule, example)
+                    self.matchingDegrees[j][classLabel] += nu
+
+
 
     def computeRuleWeight(self,rule,classLabels,i):
         """
@@ -89,8 +110,9 @@ class KnowledgeBase:
         accum = np.sum(self.matchingDegrees[i])
 
         for classLabel in classLabels:
-            sumOthers = accum-self.matchingDegrees[i][classLabel];
-            currentRW = (self.matchingDegrees[i][classLabel] - sumOthers) / accum #P-CF
+            matchClass=self.matchingDegrees[i][classLabel]
+            matchNotClass = accum-matchClass  #matchNotClass
+            currentRW = (matchClass - matchNotClass) / accum #P-CF
             if (currentRW > ruleWeight):
                 ruleWeight = currentRW
                 classIndex = classLabel
@@ -130,7 +152,6 @@ class KnowledgeBase:
                 # print(label)
                 classes = ruleBaseTmp[antecedents].keys()
                 if label in classes:
-
                     ruleBaseTmp[antecedents][label] += 1
                 else:
                     ruleBaseTmp[antecedents][label] = 1
@@ -148,11 +169,11 @@ class KnowledgeBase:
 
         print("Computing Matching Degrees Rule")
         #  Transform the rule base into arrays
-        self.includeInitialRules(ruleBaseTmp);
+        self.includeInitialRules(ruleBaseTmp)
 
 
         # Compute the matching degree of all the examples with all the rules
-        if self.RW_measure == 'RW_PCF':
+        if 'PCF' in self.RW_measure :
             print("Computing Matching Degrees All")
             self.computeMatchingDegreesAll()
 
@@ -167,12 +188,10 @@ class KnowledgeBase:
         for rule,classLabels_Info in ruleBaseTmp.items():
             classLabels = list(classLabels_Info.keys())
             i+=1
-            if self.RW_measure == 'RW_PCF':
+            if 'PCF' in self.RW_measure :  # PCF  or PCF_CS
                 classLabel,ruleWeight = self.computeRuleWeight(rule,classLabels,i)
             elif self.RW_measure == 'RW_non_fuzzy_conf':
                 classLabel, ruleWeight,supp = self.computeRuleNonFuzzyConf(rule, classLabels,classLabels_Info, i)  #return non fuzzy conf as ruleWeight
-            ###########To Do
-            # #Supp,Conf=self.computrConfandSupp can be merged with  self.computeRuleWeight
 
             if ruleWeight > self.RW_tsh:
                 new_rule=FuzzyRule(rule,classLabel,ruleWeight,supp)

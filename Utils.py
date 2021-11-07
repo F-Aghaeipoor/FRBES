@@ -129,5 +129,18 @@ def load_data(dataset_name):
         FI_X = np.ones(X.shape)
         y_nn=np.ones(y_tst.shape)
 
-    y_nn= np.array(y_nn).reshape(-1) 
+    elif dataset_name == 'MiniBoo':
+        target_col_name = 'Event'
+        data = pd.read_csv('C:/Users/MASNA.CO/Desktop/SEARCHES/Codes/data/MiniBoo/data.csv',
+                           sep=',', )
+        X = data.drop([target_col_name], axis=1).values
+        y = data[target_col_name].values
+        print(X.shape, y.shape)
+        X_tr, X_tst, y_tr, y_tst = train_test_split(X, y, test_size=0.33, random_state=42)
+        FI_X = pd.read_csv('C:/Users/MASNA.CO/Desktop/SEARCHES/Codes/data/MiniBoo/FI_X.csv',
+                           sep=',', )
+        y_nn = pd.read_csv('C:/Users/MASNA.CO/Desktop/SEARCHES/Codes/data/MiniBoo/predicted.csv',
+                           sep=',', index_col=0)
+
+    y_nn= np.array(y_nn).reshape(-1)
     return X_tr,y_tr,X_tst,y_tst,FI_X,y_nn

@@ -79,15 +79,16 @@ if __name__ == '__main__':
   # dataset_name='MB-GE-ER'
   dataset_name='data_myron'
   # dataset_name='breast_cancer'
-  # dataset_name = 'xor'
+  dataset_name = 'xor'
   # dataset_name='MAGIC'
   # dataset_name='LetterRecognitionComplete'
   # dataset_name='iris'
+  # dataset_name='MiniBoo'
   X_tr,y_tr,X_tst,y_tst,FI_X,y_nn =load_data(dataset_name)
 
   print(X_tr.shape)
   print(X_tst.shape)
   print(FI_X.shape)
 
-  runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,topF=3,prunning_ths=0.5,RW_measure='RW_PCF')    #RW_PCF  RW_non_fuzzy_conf
+  runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,topF=3,prunning_ths=0.25,RW_measure='RW_PCF_CS')    #RW_PCF  RW_PCF_CS RW_non_fuzzy_conf
 
