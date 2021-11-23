@@ -53,7 +53,7 @@ class ChiRWClassifier(BaseEstimator, ClassifierMixin):
         The classes seen at :meth:`fit`.
     """
 
-    def __init__(self, labels=3, tnorm="product", rw="pcf", frm="wr", RW_tsh=0,RW_measure='RW_PCF'):
+    def __init__(self, labels=3, tnorm="product", rw="pcf", frm="wr", RW_tsh=0,RW_measure='RW_PCF',topF=3):
         """
         Called when initializing the classifier
         only product tnorm is implemented throughout the source code
@@ -72,7 +72,7 @@ class ChiRWClassifier(BaseEstimator, ClassifierMixin):
             setattr(self, arg, val)
             # print("{} = {}".format(arg,val)
         
-    def fit(self, X, y,X_Mask):
+    def fit(self, X, y,FI_X):
         """
         This should fit the classifier. All the "work" should be done here.
 
@@ -99,8 +99,8 @@ class ChiRWClassifier(BaseEstimator, ClassifierMixin):
         
         #The learning part goes here
         dataBase = DataBase(X,self.labels)
-        self.kb = KnowledgeBase(X,y,X_Mask,dataBase,self.RW_tsh,self.RW_measure)
-        self.kb.generation()
+        self.kb = KnowledgeBase(X,y,FI_X,dataBase,self.RW_tsh,self.RW_measure)
+        self.kb.generation_variantLenght(self.topF)
 
         # Return the classifier
         return self

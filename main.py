@@ -20,15 +20,15 @@ from sklearn.metrics import confusion_matrix,ConfusionMatrixDisplay
 
 
 def runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,topF,prunning_ths,RW_measure):
-  topF=topF
-  X_Mask = getMask(X_tr,FI_X,topF)
-  NF=((X_Mask==1).sum(axis=0)!=0).sum()
-  print('Number of Contributing Features: ', NF)
+  # topF=topF
+  # X_Mask = getMask(X_tr,FI_X,topF)
+  # NF=((X_Mask==1).sum(axis=0)!=0).sum()
+  # print('Number of Contributing Features: ', NF)
 
   start_time = time.time()
-  chi = ChiRWClassifier(labels=3,frm="wr", RW_tsh=prunning_ths, RW_measure=RW_measure)
+  chi = ChiRWClassifier(labels=3,frm="wr", RW_tsh=prunning_ths, RW_measure=RW_measure,topF=topF)
 
-  chi.fit(X_tr,y_tr,X_Mask)
+  chi.fit(X_tr,y_tr,FI_X)
 
   y_pred = chi.predict(X_tr)
   acc1=accuracy_score(y_tr,y_pred)*100
@@ -67,7 +67,7 @@ def runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,topF,prunning_ths,RW_measure):
   NR=chi.kb.NR
   ARL=chi.kb.ARL
   ths = prunning_ths
-
+  NF=0
   return acc1,acc2,auc_tst,GM,NF,NR,ARL,Fidelity,ths
   ##Standard cross-validation is also available
   #scores = cross_val_score(chi, iris.data, iris.target, cv=5,scoring='accuracy')
@@ -77,10 +77,10 @@ def runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,topF,prunning_ths,RW_measure):
 
 if __name__ == '__main__':
   # dataset_name='MB-GE-ER'
-  dataset_name='data_myron'
+  # dataset_name='data_myron'
   # dataset_name='breast_cancer'
-  dataset_name = 'xor'
-  # dataset_name='MAGIC'
+  # dataset_name = 'xor'
+  dataset_name='MAGIC'
   # dataset_name='LetterRecognitionComplete'
   # dataset_name='iris'
   # dataset_name='MiniBoo'
