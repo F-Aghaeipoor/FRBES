@@ -48,6 +48,7 @@ class KnowledgeBase:
         self.classLabels = 0
         self.init_parameters()
         self.NF=0
+        self.rules_count = 0
 
     def init_parameters(self):
         self.X_Mask = list()
@@ -55,7 +56,7 @@ class KnowledgeBase:
         self.totalRL = 0
         self.ARL = 0
         self.NR = 0
-        self.rules_count = 0
+
 
     def includeInitialRules(self, ruleBaseTmp):
         self.classLabels = np.unique(self.y)
@@ -254,8 +255,9 @@ class KnowledgeBase:
         print("Average Rule lenght: "+str(self.ARL))
         print('--------------------------------')
         print('Min RW:', min(RWs), '\nMax RW:', max(RWs))
-        # for i in self.classLabels:
-        #     print('# Rules in class ',i,': ', self.rules_count[i])
+        self.rule_count_per_class()
+        for i in self.classLabels:
+            print('# Final Rules in class ',i,': ', self.rules_count[i])
         print('--------------------------------')
 
 
@@ -267,6 +269,10 @@ class KnowledgeBase:
                updated_RB.append(rule)
        self.fianl_ruleBase=updated_RB
 
+
+    def rule_count_per_class(self):
+        for classLabel in self.classLabels:
+            self.rules_count[classLabel] = len(list(filter(lambda r: r.getClassLabel() == classLabel , self.fianl_ruleBase)))
 
     def WR(self,example):
         """
