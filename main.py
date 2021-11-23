@@ -67,7 +67,7 @@ def runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,topF,prunning_ths,RW_measure):
   NR=chi.kb.NR
   ARL=chi.kb.ARL
   ths = prunning_ths
-  NF=0
+  NF=chi.kb.NF
   return acc1,acc2,auc_tst,GM,NF,NR,ARL,Fidelity,ths
   ##Standard cross-validation is also available
   #scores = cross_val_score(chi, iris.data, iris.target, cv=5,scoring='accuracy')
@@ -78,9 +78,9 @@ def runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,topF,prunning_ths,RW_measure):
 if __name__ == '__main__':
   # dataset_name='MB-GE-ER'
   # dataset_name='data_myron'
-  # dataset_name='breast_cancer'
+  dataset_name='breast_cancer'
   # dataset_name = 'xor'
-  dataset_name='MAGIC'
+  # dataset_name='MAGIC'
   # dataset_name='LetterRecognitionComplete'
   # dataset_name='iris'
   # dataset_name='MiniBoo'
@@ -90,5 +90,5 @@ if __name__ == '__main__':
   print(X_tst.shape)
   print(FI_X.shape)
 
-  runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,topF=3,prunning_ths=0.25,RW_measure='RW_PCF_CS')    #RW_PCF  RW_PCF_CS RW_non_fuzzy_conf
+  runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,topF=3,prunning_ths=0.5,RW_measure='RW_PCF_CS')    #RW_PCF  RW_PCF_CS RW_non_fuzzy_conf
 
