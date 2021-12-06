@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed May  8 13:18:11 2019
-Modified on Fri May 23 18:20:32 2019
+Modified on November 2021
 
 
 @author: Alberto Fernandez - University of Granada - (alberto@decsai.ugr.es)
+@author: Fatemeh Aghaeipoor - Institute for Research in Fundamental Sciences (IPM) - (f.aghaei@ipm.ir)
+
 """
 
 from FuzzyVariable import FuzzyVariable
@@ -27,17 +29,15 @@ class DataBase():
     FuzzyLabels_ : list, shape (n_features, n_labels)
         An Array containing all fuzzy variables.
     """
-    
-    """
-    Compute the ranges for each variable / column
-        
-    * X is the input training data
-    * labels are the number of labels
-        
-    Considers each variable to be either nominal (crisp) of numerical (triangular fuzzy set)
-    """
     def __init__(self, X, labels):
-    
+        """
+        Compute the ranges for each variable / column
+
+        * X is the input training data
+        * labels are the number of labels
+
+        Considers each variable to be either nominal (crisp) of numerical (triangular fuzzy set)
+        """
         self.FuzzyLabels_ = list()
         self.labels = labels
         for column in X.T:
@@ -50,18 +50,16 @@ class DataBase():
             
             self.FuzzyLabels_.append(fuzzyVar)
 
-    """
-    Obtains the fuzzy labels with highest membership values for the given example
-        
-    * example is the input example
-        
-    The antecedent is built as a string to be used as key in a hast table for the rules
-    """
     def getRuleFromExample(self,example,example_mask):
+        """
+        Obtains the fuzzy labels with highest membership values for the given example
+
+        * example is the input example
+
+        The antecedent is built as a string to be used as key in a hast table for the rules
+        """
         labels = str()
         j=0
-        # print(example)
-        # print(example_mask)
         for fuzzyVar,inputValue, mask in zip(self.FuzzyLabels_,example,example_mask):
 
             if mask==1 :
@@ -69,21 +67,19 @@ class DataBase():
                 labels = labels + str(fuzzyVar.getLabelIndex(inputValue))+','
             else:
                 labels = labels + str(-1)+','
-        # print('len -==============',j)
         return labels
 
-    """
-    Computes the fuzzy membership degree according to the fuzzy variables
-        
-    * variable is the index of the variable
-    * label is the index of the fuzzy label 
-    * value is the value to be "fuzzyfied"
-        
-    In case of nominal variable, the output is {0,1} regarding equality
-    In case of fuzzy variable, the output is computed with the fuzzy membership function
-    """
     def computeMembershipDegree (self, variable, label, value):
-    
+        """
+        Computes the fuzzy membership degree according to the fuzzy variables
+
+        * variable is the index of the variable
+        * label is the index of the fuzzy label
+        * value is the value to be "fuzzyfied"
+
+        In case of nominal variable, the output is {0,1} regarding equality
+        In case of fuzzy variable, the output is computed with the fuzzy membership function
+        """
         if (isinstance(self.FuzzyLabels_[variable],NominalVariable)):
             if self.FuzzyLabels_[variable] == value:
                 return 1
@@ -91,17 +87,16 @@ class DataBase():
                 return 0
         else:   
             return self.FuzzyLabels_[variable][label].getMembershipDegree(value)
-    
-    """
-    Computes the matching degree of the example to the rule. 
-        
-    * rule is the fuzzy rule (antecedents with Fuzzy/Nominal variables)
-    * example is the tuple with the values to be "fuzzyfied"
-        
-    Product t-norm is used for the whole antecedent. No other t-norm is currently implemented
-    """
+
     def computeMatchingDegree(self,rule,example):
-    
+        """
+        Computes the matching degree of the example to the rule.
+
+        * rule is the fuzzy rule (antecedents with Fuzzy/Nominal variables)
+        * example is the tuple with the values to be "fuzzyfied"
+
+        Product t-norm is used for the whole antecedent. No other t-norm is currently implemented
+        """
         matching = 1.0 
 
         for i in range(len(example)):
@@ -118,9 +113,15 @@ class DataBase():
                         matching = 0.0
         return matching;        
 
-
     def computeMatchingDegree2(self,rule,example):
-        
+        """
+        Computes the matching degree of the example to the rule.
+
+        * rule is the fuzzy rule (antecedents with Fuzzy/Nominal variables)
+        * example is the tuple with the values to be "fuzzyfied"
+
+        Product t-norm is used for the whole antecedent. No other t-norm is currently implemented
+        """
         matching = 1.0 
 #        non_masked_Ante=[ind for ind ,val  in enumerate( rule.antecedents) if val != -1]
         non_masked_Ante=rule.real_antecedents

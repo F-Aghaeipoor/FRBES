@@ -2,17 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed May  8 12:59:30 2019
-Modified on Wed May 29 17:30:05 2019
+Modified on November 2021
 
 @author: Alberto Fernandez - University of Granada - (alberto@decsai.ugr.es)
-"""
+@author: Fatemeh Aghaeipoor - Institute for Research in Fundamental Sciences (IPM) - (f.aghaei@ipm.ir)
 
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Wed May  8 11:55:23 2019
-
-@author: albertoSaurusRex
 """
 
 import inspect
@@ -53,7 +47,7 @@ class ChiRWClassifier(BaseEstimator, ClassifierMixin):
         The classes seen at :meth:`fit`.
     """
 
-    def __init__(self, labels=3, tnorm="product", rw="pcf", frm="wr", RW_tsh=0,RW_measure='RW_PCF',topF=3):
+    def __init__(self, labels=3, tnorm="product", rw="pcf", frm="wr", RW_tsh=0,RW_measure='RW_PCF',maxLen=3):
         """
         Called when initializing the classifier
         only product tnorm is implemented throughout the source code
@@ -100,7 +94,9 @@ class ChiRWClassifier(BaseEstimator, ClassifierMixin):
         #The learning part goes here
         dataBase = DataBase(X,self.labels)
         self.kb = KnowledgeBase(X,y,FI_X,dataBase,self.RW_tsh,self.RW_measure)
-        self.kb.generation_variantLenght(self.topF)
+
+        self.kb.generation(self.maxLen)
+        # self.kb.generation_variantLenght(self.maxLen)
 
         # Return the classifier
         return self
