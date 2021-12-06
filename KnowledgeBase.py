@@ -11,7 +11,7 @@ Modified on November 2021
 import numpy as np
 from FuzzyRule import FuzzyRule
 from Utils import *
-
+import statistics
 class KnowledgeBase:
     """
     The whole Knowledge Base is represented here
@@ -224,21 +224,23 @@ class KnowledgeBase:
         return list(filter(lambda r: r.toRemove==False, RB))
 
     def select_ths(self,RB):
-       updated_RB=list()
-       for  rule in RB:
-           if rule.ruleWeight > self.RW_tsh:
-               updated_RB.append(rule)
-       RB=updated_RB
+       # updated_RB=list()
+       # for  rule in RB:
+       #     if rule.ruleWeight > self.RW_tsh:
+       #         updated_RB.append(rule)
 
-       # updated_RB = list()
-       # for classLabel in self.classLabels:
-       #     RB = list(filter(lambda r: r.getClassLabel() == classLabel, RB))
-       #     for  rule in RB:
-       #         if rule.ruleWeight > self.RW_tsh:
-       #             updated_RB.append(rule)
-       #     RB=updated_RB
+       updated_RB = list()
+       for classLabel in self.classLabels:
+           RB1 = list(filter(lambda r: r.getClassLabel() == classLabel, RB))
+           RWs = [i.ruleWeight for i in RB1]
+           # RW_tsh = statistics.median(RWs)
+           RW_tsh = statistics.mean(RWs)
+           print('RW_tsh = ', RW_tsh)
+           for  rule in RB1:
+               if rule.ruleWeight >= RW_tsh:
+                   updated_RB.append(rule)
 
-       return RB
+       return updated_RB
 
     def select_topRW_per_Class(self,RB):
        updated_RB=list()
