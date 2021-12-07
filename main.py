@@ -79,10 +79,10 @@ def runFRE(X_tr,y_tr,X_tst,y_tst,FI_X,y_nn,maxLen,prunning_ths,RW_measure):
 
 if __name__ == '__main__':
   dataset_name='MB-GE-ER'
-  dataset_name='data_myron'
-  # dataset_name='breast_cancer'
-  # dataset_name = 'xor'
-  dataset_name='MAGIC'
+  # dataset_name='data_myron'
+  dataset_name='breast_cancer'
+  dataset_name = 'xor'
+  # dataset_name='MAGIC'
   # dataset_name='LetterRecognitionComplete'
   # dataset_name='iris'
   # dataset_name='MiniBoo'

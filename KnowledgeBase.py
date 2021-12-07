@@ -224,21 +224,31 @@ class KnowledgeBase:
         return list(filter(lambda r: r.toRemove==False, RB))
 
     def select_ths(self,RB):
-       # updated_RB=list()
-       # for  rule in RB:
-       #     if rule.ruleWeight > self.RW_tsh:
-       #         updated_RB.append(rule)
+       updated_RB=list()
+       for  rule in RB:
+           if rule.ruleWeight > self.RW_tsh:
+               updated_RB.append(rule)
 
-       updated_RB = list()
-       for classLabel in self.classLabels:
-           RB1 = list(filter(lambda r: r.getClassLabel() == classLabel, RB))
-           RWs = [i.ruleWeight for i in RB1]
-           # RW_tsh = statistics.median(RWs)
-           RW_tsh = statistics.mean(RWs)
-           print('RW_tsh = ', RW_tsh)
-           for  rule in RB1:
-               if rule.ruleWeight >= RW_tsh:
-                   updated_RB.append(rule)
+       # updated_RB = list()
+       # for classLabel in self.classLabels:
+       #     RB1 = list(filter(lambda r: r.getClassLabel() == classLabel, RB))
+       #     RWs = [i.ruleWeight for i in RB1]
+       #     # RW_tsh = statistics.median(RWs)
+       #     RW_tsh = statistics.mean(RWs)
+       #     print('RW_tsh = ', RW_tsh)
+       #     for  rule in RB1:
+       #         if rule.ruleWeight >= RW_tsh:
+       #             updated_RB.append(rule)
+
+       # updated_RB = list()
+       # # self.set_three_measures_of_each_rule(RB)
+       # RWs = [i.ruleWeight for i in RB]
+       # # RW_tsh = statistics.median(RWs)
+       # RW_tsh = statistics.mean(RWs)
+       # print('RW_tsh = ', RW_tsh)
+       # for  rule in RB:
+       #     if rule.ruleWeight >= RW_tsh:
+       #         updated_RB.append(rule)
 
        return updated_RB
 
@@ -312,9 +322,11 @@ class KnowledgeBase:
                     for ind, value in enumerate(Covered_Labels_.split(',')[:-1]):
                         Covered_Labels.append(int(value))
 
+                    # print('Covered_Labels ',Covered_Labels)
+                    # print('getAntecedents ',fuzzyRule.getAntecedents())
                     if Covered_Labels == fuzzyRule.getAntecedents():
                         count1 += 1
-
+                print(count1)
                 fuzzyRule.nCovered = count1
 
                 # 2.  nWell_Classified :
