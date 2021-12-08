@@ -203,6 +203,7 @@ class KnowledgeBase:
         print(f"Number of rules After prunning : {self.ruleBase.__len__()}")
 
         ## 3. best rule selection
+        # self.set_three_measures_of_each_rule(self.ruleBase)
         self.ruleBase = self.select_ths(self.ruleBase)
         # self.ruleBase = self.select_topRW_per_Class(self.ruleBase)
         print(f"Number of rules After selection : {self.ruleBase.__len__()}")
@@ -219,15 +220,18 @@ class KnowledgeBase:
                 RB_subset = base_rule.getSubRulesAvailableInRB(RB)
                 # print(len(RB_subset))
                 for sub_rule in RB_subset:
-                    if sub_rule.getRW()  > base_rule.getRW():
+                    if sub_rule.getRW()  >= base_rule.getRW():
                         base_rule.toRemove = True
         return list(filter(lambda r: r.toRemove==False, RB))
 
     def select_ths(self,RB):
        updated_RB=list()
        for  rule in RB:
+           # if rule.p > self.RW_tsh:
            if rule.ruleWeight > self.RW_tsh:
+           # if rule.Conf > self.RW_tsh:
                updated_RB.append(rule)
+               # rule.printInfo()
 
        # updated_RB = list()
        # for classLabel in self.classLabels:
@@ -324,9 +328,9 @@ class KnowledgeBase:
 
                     # print('Covered_Labels ',Covered_Labels)
                     # print('getAntecedents ',fuzzyRule.getAntecedents())
-                    if Covered_Labels == fuzzyRule.getAntecedents():
+                    if self.compare(fuzzyRule.getAntecedents(),Covered_Labels)==True:
                         count1 += 1
-                print(count1)
+                # print(count1)
                 fuzzyRule.nCovered = count1
 
                 # 2.  nWell_Classified :
@@ -337,6 +341,15 @@ class KnowledgeBase:
                 fuzzyRule.p = fuzzyRule.nWell_Classified/fuzzyRule.nCovered
 
                 # fuzzyRule.printInfo()
+
+    def compare(self,getAntecedents,Covered_Labels):
+        Ant_index = [i for i, val in enumerate(getAntecedents) if val != -1]
+        flag = True
+        for k in Ant_index:
+            if getAntecedents[k] != Covered_Labels[k]:
+                flag = False
+                break
+        return flag
 
     def rule_count_per_class(self,RB):
         for classLabel in self.classLabels:
