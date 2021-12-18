@@ -53,10 +53,11 @@ class KnowledgeBase:
         self.fianl_ruleBase = list()
         self.classLabels = 0
         self.init_parameters()
-        self.NF=0
+        self.NF=0         # number of contributing features in general = NC[maxLen}
         self.rules_count = 0
         self.maxLen=0
-
+        self.N = len(self.X)
+        self.NC = list()  # number of contributing features per len in range(maxLen)
     def init_parameters(self):
         self.X_Mask = list()
         self.ruleBase = list()
@@ -71,7 +72,7 @@ class KnowledgeBase:
         self.matchingDegrees = np.resize(self.matchingDegrees,(len(ruleBaseTmp),len(self.classLabels)))
         self.matchingDegrees_examples = np.resize(self.matchingDegrees_examples, (len(self.X),len(ruleBaseTmp)))
         for rule in ruleBaseTmp.keys():  #Create Initial rules
-            fuzzyRule = FuzzyRule(rule,0,0,0,0,0) # no class, rule weight,Supp,index,Conf yet
+            fuzzyRule = FuzzyRule(rule,0,0,0,0,0,0,0) # no class, rule weight,index,crisp_supp,crisp_conf yet
             self.ruleBase.append(fuzzyRule)
         
     def computeMatchingDegreesAll(self):
@@ -116,7 +117,7 @@ class KnowledgeBase:
     def computeRuleWeight(self,rule,classLabels,classLabels_Info,i):
         """
             It computes the fuzzy confidence (RW) of the rule by Penalized Certainty Factor (PCF with or without cost)
-            also the crisp confidence and support of each rule.
+            also the crisp confidence and crisp_support of each rule.
             
             * rule: the fuzzy rule
             * classLabels: the possible class labels of this rule (those with MF > 0)
@@ -125,20 +126,26 @@ class KnowledgeBase:
         """
         ruleWeight = 0.0
         classIndex = -1
-        conf=0
+        crisp_conf=0
         accum = 0.0
         accum = np.sum(self.matchingDegrees[i])
-        supp = sum(list(classLabels_Info.values()))
+        crisp_supp = sum(list(classLabels_Info.values()))
+        fuzzy_supp = 0
+        fuzzy_conf = 0
         for classLabel in classLabels:
             matchClass=self.matchingDegrees[i][classLabel] #matchClass
             matchNotClass = accum-matchClass  #matchNotClass
             currentRW = (matchClass - matchNotClass) / accum # PCF = matchClass - matchNotClass / matchClass + matchNotClass
-            currentConf = classLabels_Info[classLabel] / supp
+            current_crisp_conf = classLabels_Info[classLabel] / crisp_supp
+            current_fuzzy_supp =  accum / self.N     # =   matchClass + matchNotClass / N
+            current_fuzzy_conf =  matchClass / accum   # =   matchClass  / matchClass + matchNotClass
             if (currentRW > ruleWeight):
                 ruleWeight = currentRW
-                conf = currentConf
+                crisp_conf = current_crisp_conf
+                fuzzy_supp = current_fuzzy_supp
+                fuzzy_conf = current_fuzzy_conf
                 classIndex = classLabel
-        return classIndex,ruleWeight,supp,conf
+        return classIndex,ruleWeight,crisp_supp,crisp_conf,fuzzy_supp,fuzzy_conf
 
     def generation(self,maxLen):
         """
@@ -152,6 +159,7 @@ class KnowledgeBase:
             # 1.1.1 Select to input features
             self.X_Mask =  getMask(self.X,self.FI_X,len+1)
             NF=((self.X_Mask==1).sum(axis=0)!=0).sum()
+            self.NC.append(NF)
             print('---------------------------')
             print('Number of top Features: ', len+1)
             print('Number of Contributing Features: ', NF)
@@ -187,10 +195,10 @@ class KnowledgeBase:
             classLabels = list(classLabels_Info.keys())
             i+=1
             if 'PCF' in self.RW_measure :  # PCF  or  PCF_CS
-                classLabel,ruleWeight,supp,conf = self.computeRuleWeight(rule, classLabels,classLabels_Info, i)
+                classLabel,ruleWeight,crisp_supp,crisp_conf,fuzzy_supp,fuzzy_conf = self.computeRuleWeight(rule, classLabels,classLabels_Info, i)
 
             if ruleWeight > 0:
-                new_rule=FuzzyRule(rule,classLabel,ruleWeight,supp,i,conf)
+                new_rule=FuzzyRule(rule,classLabel,ruleWeight,i,crisp_supp,crisp_conf,fuzzy_supp,fuzzy_conf)
                 self.ruleBase.append(new_rule)
                 # new_rule.printInfo()
             else:
@@ -204,8 +212,8 @@ class KnowledgeBase:
 
         ## 3. best rule selection
         # self.set_three_measures_of_each_rule(self.ruleBase)
-        self.ruleBase = self.select_ths(self.ruleBase)
-        # self.ruleBase = self.select_topRW_per_Class(self.ruleBase)
+        # self.ruleBase = self.select_ths(self.ruleBase)
+        self.ruleBase = self.select_topRW_per_Class(self.ruleBase)
         print(f"Number of rules After selection : {self.ruleBase.__len__()}")
 
         self.fianl_ruleBase = self.ruleBase
@@ -220,8 +228,11 @@ class KnowledgeBase:
                 RB_subset = base_rule.getSubRulesAvailableInRB(RB)
                 # print(len(RB_subset))
                 for sub_rule in RB_subset:
-                    if sub_rule.getRW()  >= base_rule.getRW():
+                    # if sub_rule.getRW()  >= base_rule.getRW():    # prune redundant based on RW
+                    if sub_rule.getfuzzy_conf() >= base_rule.getfuzzy_conf():   # prune redundant based on fuzzy confidance
                         base_rule.toRemove = True
+                    # else:
+                    #     sub_rule.toRemove = True
         return list(filter(lambda r: r.toRemove==False, RB))
 
     def select_ths(self,RB):
@@ -229,9 +240,9 @@ class KnowledgeBase:
        for  rule in RB:
            # if rule.p > self.RW_tsh:
            if rule.ruleWeight > self.RW_tsh:
-           # if rule.Conf > self.RW_tsh:
+           # if rule.fuzzy_conf > self.RW_tsh:
                updated_RB.append(rule)
-               # rule.printInfo()
+               rule.printInfo()
 
        # updated_RB = list()
        # for classLabel in self.classLabels:
@@ -253,16 +264,28 @@ class KnowledgeBase:
        # for  rule in RB:
        #     if rule.ruleWeight >= RW_tsh:
        #         updated_RB.append(rule)
-
+       print('--------')
+       for k in range(self.maxLen, 0, -1):
+           RB = list(filter(lambda r: (r.getLenght() == k), updated_RB))
+           print(f"Number of rule with len {k} : {len(RB)}")
+       print('--------')
        return updated_RB
 
     def select_topRW_per_Class(self,RB):
        updated_RB=list()
+       prob = [0.02,0.03,0.05]
+       F=len(self.X[0])
        for classLabel in self.classLabels:
-           RB_This_class = list(filter(lambda r: r.getClassLabel() == classLabel, RB))
-           RB_This_class_sorted = sorted(RB_This_class, key=lambda rule: rule.p)   # measure of prunning could be set here  , reverse=True to descending
-           updated_RB = updated_RB+RB_This_class_sorted[:round(len(RB_This_class_sorted)/4)]
+               RB_This_class = list(filter(lambda r: r.getClassLabel() == classLabel, RB))
+               RB_This_class_sorted = sorted(RB_This_class, key=lambda rule: rule.fuzzy_conf, reverse=True)   # measure of prunning could be set here  , reverse=True to descending
+               n = len(RB_This_class_sorted) * self.RW_tsh
+               print(f'rules in class {classLabel} is : {n} among {len(RB_This_class_sorted)}')
+               updated_RB = updated_RB+RB_This_class_sorted[:round(n)]
        RB=updated_RB
+
+       for r in RB:
+           r.printInfo()
+
        return RB
 
     def WR(self,example):
@@ -418,10 +441,10 @@ class KnowledgeBase:
             classLabels = list(classLabels_Info.keys())
             i += 1
             if 'PCF' in self.RW_measure:  # PCF  or PCF_CS
-                classLabel, ruleWeight, supp, conf = self.computeRuleWeight(rule, classLabels, classLabels_Info, i)
+                classLabel, ruleWeight, crisp_supp, crisp_conf,fuzzy_supp,fuzzy_conf = self.computeRuleWeight(rule, classLabels, classLabels_Info, i)
 
             if ruleWeight > 0:
-                new_rule = FuzzyRule(rule, classLabel, ruleWeight, supp, i, conf)
+                new_rule = FuzzyRule(rule, classLabel, ruleWeight, i, crisp_supp, crisp_conf,fuzzy_supp,fuzzy_conf)
                 self.rules_count[classLabel] += 1
                 self.ruleBase.append(new_rule)
                 self.totalRL += new_rule.getLenght()
@@ -475,3 +498,22 @@ class KnowledgeBase:
         for i in self.classLabels:
             print('# Final Rules in class ',i,': ', self.rules_count[i])
         print('--------------------------------')
+
+
+
+
+        # def CFM_BD_Selection(self, RB):
+        #     updated_RB = list()
+        #     prob = [0.02, 0.03, 0.05]
+        #     F = len(self.X[0])
+        #     for classLabel in self.classLabels:
+        #         for k in range(self.maxLen):
+        #             RB_This_class = list(
+        #                 filter(lambda r: (r.getClassLabel() == classLabel and r.getLenght() == k + 1), RB))
+        #             RB_This_class_sorted = sorted(RB_This_class, key=lambda
+        #                 rule: rule.fuzzy_conf)  # measure of prunning could be set here  , reverse=True to descending
+        #             n = 3 * self.NC[k] * prob[k] * 2
+        #             print(f'rules of len {k + 1} in class {classLabel} is : {n} among {len(RB_This_class_sorted)}')
+        #             updated_RB = updated_RB + RB_This_class_sorted[:round(n)]
+        #     RB = updated_RB
+        #     return RB

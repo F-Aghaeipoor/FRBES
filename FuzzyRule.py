@@ -18,7 +18,7 @@ class FuzzyRule:
         * ruleWeight: consequent confidence degree
     """
     
-    def __init__(self,antecedents,classLabel,ruleWeight,Supp,index,Conf=0):
+    def __init__(self,antecedents,classLabel,ruleWeight,index,crisp_supp,crisp_conf,fuzzy_supp,fuzzy_conf):
         """
             Creates a rule from already established values
             * antecedents is a list of strings, each of each is simple a number (fuzzy label index)
@@ -33,9 +33,11 @@ class FuzzyRule:
                 self.real_antecedents.append(ind)
         self.classLabel = classLabel
         self.ruleWeight = ruleWeight
-        self.Supp = Supp
         self.index= index  # index of rule in matchingdegree matrix (r*c)
-        self.Conf = Conf
+        self.crisp_supp = crisp_supp
+        self.crisp_conf = crisp_conf
+        self.fuzzy_supp = fuzzy_supp
+        self.fuzzy_conf = fuzzy_conf
         self.nCovered = 0  # number of examples that are covered by this rule
         self.nWell_Classified = 0  # number of examples that are well classified by this rule (i.e., this rule wins for those)
         self.p = 0   # p percent well performing measure = nWell_Classified/nCovered
@@ -52,9 +54,11 @@ class FuzzyRule:
         return self.antecedents[pos]
     
     def getRW(self):
-        # return  self.Conf
         return self.ruleWeight
-    
+
+    def getfuzzy_conf(self):
+        return  self.fuzzy_conf
+
     def getClassLabel(self):
         return self.classLabel
         
@@ -82,6 +86,6 @@ class FuzzyRule:
         return sub  # must be refine with set including  all sub rules of this rule available in RB
 
     def printInfo(self):
-        print("Rule found: IF ", self.getAntecedents(), "THEN", self.getClassLabel(), ", RL",self.getLenght(), ", RW:", round(self.ruleWeight,3), ', Supp:', self.Supp,
-              ', Conf:', self.Conf, ', nCovered:', self.nCovered, ', nWell_Classified:', self.nWell_Classified, ', P:', self.p)
+        # print("Rule found: IF ", self.getAntecedents(), "THEN", self.getClassLabel(), ", RL",self.getLenght(), ", RW:", round(self.ruleWeight,3), ', crisp_supp:', self.crisp_supp,', crisp_conf:', self.crisp_conf,', fuzzy_supp:', self.fuzzy_supp, ', fuzzy_conf:', self.fuzzy_conf, ', nCovered:', self.nCovered, ', nWell_Classified:', self.nWell_Classified, ', P:', self.p)
+        print("Rule found: IF ", self.getAntecedents(), "THEN", self.getClassLabel(), ", RL",self.getLenght(), ", RW:", round(self.ruleWeight,3), ', crisp_supp:', self.crisp_supp,', crisp_conf:', self.crisp_conf,', fuzzy_supp:', self.fuzzy_supp, ', fuzzy_conf:', self.fuzzy_conf)
 
