@@ -209,12 +209,14 @@ class KnowledgeBase:
         ## 2. prun coverd rules
         self.ruleBase = self.prun_covered(self.ruleBase)
         print(f"Number of rules After prunning : {self.ruleBase.__len__()}")
+        self.count_contributingFe(self.ruleBase)
 
         ## 3. best rule selection
         # self.set_three_measures_of_each_rule(self.ruleBase)
         # self.ruleBase = self.select_ths(self.ruleBase)
         self.ruleBase = self.select_topRW_per_Class(self.ruleBase)
         print(f"Number of rules After selection : {self.ruleBase.__len__()}")
+        self.count_contributingFe( self.ruleBase)
 
         self.fianl_ruleBase = self.ruleBase
         self.printInfo(self.fianl_ruleBase)
@@ -374,6 +376,11 @@ class KnowledgeBase:
                 break
         return flag
 
+    def count_contributingFe(self, RB):
+        ants = [i.antecedents for i in RB]
+        self.NF = ((np.array(ants) != -1).sum(axis=0) != 0).sum()
+        print(f"Number of Contributing Features: {self.NF}")
+
     def rule_count_per_class(self,RB):
         for classLabel in self.classLabels:
             self.rules_count[classLabel] = len(list(filter(lambda r: r.getClassLabel() == classLabel , RB)))
@@ -382,6 +389,7 @@ class KnowledgeBase:
         RWs=[i.ruleWeight for i in RB]
         RLs = [i.getLenght() for i in RB]
         print('---------------------------')
+        print('Number of Contributing Features: ', self.NF)
         self.NR=len(RB)
         print("Size of Final Rule Base: "+str(self.NR))
         self.totalRL = sum(RLs)
